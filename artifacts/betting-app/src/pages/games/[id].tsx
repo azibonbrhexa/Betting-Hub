@@ -13,6 +13,7 @@ export default function GameDetail() {
   const id = Number(params.id);
   const [, setLocation] = useLocation();
 
+  // @ts-ignore
   const { data: game, isLoading } = useGetGame(id, { query: { enabled: !!id } });
 
   const { data: bets } = useGetBets({

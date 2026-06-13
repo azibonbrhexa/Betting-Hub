@@ -19,7 +19,7 @@ export default function AdminGames() {
 
   const handleToggle = async (gameId: number, field: string, value: boolean) => {
     try {
-      await updateMutation.mutateAsync({ gameId, data: { [field]: value } });
+      await updateMutation.mutateAsync({ id: gameId, data: { [field]: value } as any });
       toast({ title: "Game updated" });
       refetch();
     } catch (err: any) {
@@ -61,7 +61,7 @@ export default function AdminGames() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {gamesData?.data.map(g => (
+              {(gamesData as any)?.map?.((g: any) => (
                 <tr key={g.id} className="hover:bg-white/5">
                   <td className="px-6 py-4">
                     <div className="font-medium text-white">{g.name}</div>

@@ -8,7 +8,9 @@ import { formatCurrency } from "@/lib/format";
 export function Header() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  // @ts-ignore
   const { data: wallet } = useGetWallet({ query: { enabled: !!user } });
+  // @ts-ignore
   const { data: notifications } = useGetNotifications({ query: { enabled: !!user } });
 
   const unreadCount = notifications?.filter(n => !n.read).length || 0;
@@ -28,7 +30,7 @@ export function Header() {
           <div className="flex flex-col items-end mr-2">
             <span className="text-xs text-muted-foreground font-mono">BALANCE</span>
             <span className="text-sm font-bold text-[#E0AA3E]">
-              {wallet ? formatCurrency(wallet.balance) : "$0.00"}
+              {wallet ? formatCurrency(wallet.balance) : "৳0.00"}
             </span>
           </div>
           <Button 

@@ -6,7 +6,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 export default function AdminDashboard() {
   const { data: stats } = useGetAdminStats();
   // Get last 7 days report
-  const { data: dailyReport } = useGetDailyReport({ query: { date: new Date().toISOString() } });
+  const { data: dailyReport } = useGetDailyReport({ date: new Date().toISOString().split('T')[0] });
 
   // Mock data for charts if API doesn't return full historical array
   const chartData = [
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
                 <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="rgba(255,255,255,0.5)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                <YAxis stroke="rgba(255,255,255,0.5)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `৳${value}`} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
                   itemStyle={{ color: 'hsl(var(--primary))' }}

@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatCurrency } from "@/lib/format";
 
-const QUICK_AMOUNTS = ["1", "5", "10", "50"];
+const QUICK_AMOUNTS = ["50", "100", "500", "1000"];
 const ROWS = 8;
 
 const MULTIPLIERS: Record<string, number[]> = {
@@ -150,7 +150,7 @@ export default function PlinkoGame({ gameId }: { gameId: number }) {
         <label className="text-xs text-muted-foreground mb-1 block uppercase tracking-wider">Bet Amount</label>
         <Input value={betAmount} onChange={e => setBetAmount(e.target.value)} type="number" className="bg-black/60 border-white/10 font-mono" disabled={dropping} />
         <div className="flex gap-1 mt-1">
-          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={dropping} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">${a}</button>)}
+          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={dropping} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">৳{a}</button>)}
         </div>
       </div>
 

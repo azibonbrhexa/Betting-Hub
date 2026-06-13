@@ -21,7 +21,7 @@ export default function AdminUsers() {
 
   const handleStatusChange = async (userId: number, newStatus: string) => {
     try {
-      await updateMutation.mutateAsync({ userId, data: { status: newStatus } });
+      await updateMutation.mutateAsync({ id: userId, data: { status: newStatus } });
       toast({ title: "User updated successfully" });
       refetch();
     } catch (err: any) {

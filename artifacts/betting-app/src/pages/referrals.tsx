@@ -91,14 +91,14 @@ export default function Referrals() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {referrals?.length === 0 ? (
+                  {referrals?.referrals?.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
                         You haven't referred anyone yet. Share your link to get started!
                       </td>
                     </tr>
                   ) : (
-                    referrals?.map(ref => (
+                    referrals?.referrals?.map(ref => (
                       <tr key={ref.id} className="hover:bg-white/5">
                         <td className="px-6 py-4 font-medium">{ref.username}</td>
                         <td className="px-6 py-4 text-muted-foreground">{formatDate(ref.createdAt)}</td>

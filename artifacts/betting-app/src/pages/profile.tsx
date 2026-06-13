@@ -9,6 +9,7 @@ import { Link, useLocation } from "wouter";
 
 export default function Profile() {
   const { user, logout } = useAuth();
+  // @ts-ignore
   const { data: stats } = useGetBetStats({ query: { enabled: !!user } });
   const [, setLocation] = useLocation();
 

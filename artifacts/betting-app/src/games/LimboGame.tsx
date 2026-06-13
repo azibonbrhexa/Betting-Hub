@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatCurrency } from "@/lib/format";
 
-const QUICK_AMOUNTS = ["1", "5", "10", "50"];
+const QUICK_AMOUNTS = ["50", "100", "500", "1000"];
 const QUICK_TARGETS = ["1.5", "2", "3", "5", "10", "100"];
 
 export default function LimboGame({ gameId }: { gameId: number }) {
@@ -45,7 +45,7 @@ export default function LimboGame({ gameId }: { gameId: number }) {
       const res = await placeBetMutation.mutateAsync({
         data: { gameId, amount, gameData: { type: "limbo", target: targetVal } }
       });
-      const finalValue = res.gameData?.result ?? (res.payout > 0 ? targetVal * 1.1 : targetVal * 0.5);
+      const finalValue = (res.gameData as any)?.result ?? (res.payout > 0 ? targetVal * 1.1 : targetVal * 0.5);
       clearInterval(interval);
       setTimeout(() => {
         setDisplayValue(finalValue.toFixed(2) + "x");
@@ -114,7 +114,7 @@ export default function LimboGame({ gameId }: { gameId: number }) {
         <Input value={betAmount} onChange={e => setBetAmount(e.target.value)} type="number"
           className="bg-black/60 border-white/10 font-mono text-lg" disabled={spinning} />
         <div className="flex gap-1 mt-1">
-          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={spinning} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">${a}</button>)}
+          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={spinning} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">৳{a}</button>)}
           <button onClick={() => setBetAmount(b => String(parseFloat(b) / 2))} disabled={spinning} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-2 py-1 font-mono disabled:opacity-40">½</button>
           <button onClick={() => setBetAmount(b => String(parseFloat(b) * 2))} disabled={spinning} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-2 py-1 font-mono disabled:opacity-40">2x</button>
         </div>

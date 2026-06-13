@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatCurrency } from "@/lib/format";
 
-const QUICK_AMOUNTS = ["1", "5", "10", "50"];
+const QUICK_AMOUNTS = ["50", "100", "500", "1000"];
 
 function calcMultiplier(target: number, over: boolean): number {
   const winChance = over ? (100 - target) / 100 : target / 100;
@@ -46,7 +46,7 @@ export default function DiceGame({ gameId }: { gameId: number }) {
       const res = await placeBetMutation.mutateAsync({
         data: { gameId, amount, gameData: { type: "dice", target, over } }
       });
-      const finalRoll = res.gameData?.roll ?? Math.floor(Math.random() * 100) + 1;
+      const finalRoll = (res.gameData as any)?.roll ?? Math.floor(Math.random() * 100) + 1;
       clearInterval(interval);
       setTimeout(() => {
         setDisplayRoll(finalRoll);
@@ -135,7 +135,7 @@ export default function DiceGame({ gameId }: { gameId: number }) {
         <label className="text-xs text-muted-foreground mb-1 block uppercase tracking-wider">Bet Amount</label>
         <Input value={betAmount} onChange={e => setBetAmount(e.target.value)} type="number" className="bg-black/60 border-white/10 font-mono text-lg" disabled={rolling} />
         <div className="flex gap-1 mt-1">
-          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={rolling} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">${a}</button>)}
+          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={rolling} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">৳{a}</button>)}
           <button onClick={() => setBetAmount(b => String(parseFloat(b) / 2))} disabled={rolling} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-2 py-1 font-mono transition-colors disabled:opacity-40">½</button>
           <button onClick={() => setBetAmount(b => String(parseFloat(b) * 2))} disabled={rolling} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-2 py-1 font-mono transition-colors disabled:opacity-40">2x</button>
         </div>

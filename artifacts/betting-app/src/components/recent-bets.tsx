@@ -6,8 +6,9 @@ import { Link } from "wouter";
 
 export function RecentBets() {
   const { data: bets } = useGetRecentBets({
+    // @ts-ignore
     query: {
-      refetchInterval: 5000, // refresh every 5 seconds to feel live
+      refetchInterval: 5000,
     }
   });
 

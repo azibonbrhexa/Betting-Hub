@@ -14,7 +14,7 @@ export default function Bonuses() {
 
   const handleClaim = async (bonusId: number) => {
     try {
-      await claimMutation.mutateAsync({ data: { bonusId } });
+      await claimMutation.mutateAsync({ id: bonusId });
       toast({ title: "Bonus Claimed", description: "The bonus has been added to your account!" });
       refetchActive();
     } catch (err: any) {

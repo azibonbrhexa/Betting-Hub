@@ -10,7 +10,7 @@ import { formatCurrency } from "@/lib/format";
 
 type GameState = "idle" | "betting" | "flying" | "crashed" | "cashed_out";
 
-const QUICK_AMOUNTS = ["1", "5", "10", "50", "100"];
+const QUICK_AMOUNTS = ["50", "100", "500", "1000", "2000"];
 
 function generateCrashPoint(): number {
   const r = Math.random();
@@ -182,7 +182,7 @@ export default function CrashGame({ gameId }: { gameId: number }) {
           <div className="flex gap-1 mt-1">
             {QUICK_AMOUNTS.map(a => (
               <button key={a} onClick={() => setBetAmount(a)} disabled={gameState === "flying"}
-                className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">${a}</button>
+                className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">৳{a}</button>
             ))}
           </div>
         </div>

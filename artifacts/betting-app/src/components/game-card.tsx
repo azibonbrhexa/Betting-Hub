@@ -18,7 +18,7 @@ export function GameCard({ game }: { game: Game }) {
       return;
     }
     try {
-      await toggleFavorite.mutateAsync({ gameId: game.id });
+      await toggleFavorite.mutateAsync({ id: game.id });
       toast({ title: "Success", description: game.isFavorited ? "Removed from favorites" : "Added to favorites" });
     } catch (err) {
       toast({ title: "Error", description: "Failed to update favorite", variant: "destructive" });

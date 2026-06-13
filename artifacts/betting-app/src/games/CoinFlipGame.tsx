@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatCurrency } from "@/lib/format";
 
-const QUICK_AMOUNTS = ["1", "5", "10", "50"];
+const QUICK_AMOUNTS = ["50", "100", "500", "1000"];
 
 export default function CoinFlipGame({ gameId }: { gameId: number }) {
   const [betAmount, setBetAmount] = useState("1.00");
@@ -32,7 +32,7 @@ export default function CoinFlipGame({ gameId }: { gameId: number }) {
       const res = await placeBetMutation.mutateAsync({
         data: { gameId, amount, gameData: { type: "coin_flip", choice } }
       });
-      const side: "heads" | "tails" = res.gameData?.result ?? (Math.random() < 0.5 ? "heads" : "tails");
+      const side: "heads" | "tails" = (res.gameData as any)?.result ?? (Math.random() < 0.5 ? "heads" : "tails");
       const won = res.payout > 0;
 
       setTimeout(() => {
@@ -100,7 +100,7 @@ export default function CoinFlipGame({ gameId }: { gameId: number }) {
         <label className="text-xs text-muted-foreground mb-1 block uppercase tracking-wider">Bet Amount</label>
         <Input value={betAmount} onChange={e => setBetAmount(e.target.value)} type="number" className="bg-black/60 border-white/10 font-mono text-lg" disabled={flipping} />
         <div className="flex gap-1 mt-1">
-          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={flipping} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">${a}</button>)}
+          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={flipping} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">৳{a}</button>)}
           <button onClick={() => setBetAmount(b => String(parseFloat(b) * 2))} disabled={flipping} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-2 py-1 font-mono transition-colors disabled:opacity-40">2x</button>
         </div>
       </div>

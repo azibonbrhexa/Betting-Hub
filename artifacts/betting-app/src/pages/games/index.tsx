@@ -10,15 +10,10 @@ export default function GamesLobby() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string | undefined>();
   
-  const { data: gamesData, isLoading } = useGetGames({
-    query: {
-      queryKey: ["games", search, category],
-    },
-    request: {
-      // @ts-ignore
-      query: { search, category, limit: 50 }
-    }
-  });
+  // @ts-ignore
+  const { data: gamesData, isLoading } = useGetGames(
+    { search: search || undefined, category: category || undefined, limit: 50 }
+  );
 
   const { data: categories } = useGetGameCategories();
 

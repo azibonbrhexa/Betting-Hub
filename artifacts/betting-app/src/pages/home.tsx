@@ -3,12 +3,14 @@ import { JackpotCounter } from "@/components/jackpot-counter";
 import { GameCard } from "@/components/game-card";
 import { RecentBets } from "@/components/recent-bets";
 import { useGetJackpot, useGetTrendingGames, useGetPlatformStats } from "@workspace/api-client-react";
+import { formatCurrency, formatNumber } from "@/lib/format";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Users, TrendingUp, Trophy } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Home() {
+  // @ts-ignore
   const { data: jackpot } = useGetJackpot({ query: { refetchInterval: 3000 } });
   const { data: trendingGames } = useGetTrendingGames();
   const { data: stats } = useGetPlatformStats();
@@ -62,7 +64,7 @@ export default function Home() {
         <section className="container px-4 -mt-16 relative z-20 mb-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             <JackpotCounter label="Mini" value={jackpot?.mini || 1254.32} />
-            <JackpotCounter label="Minor" value={jackpot?.major || 15420.50} />
+            <JackpotCounter label="Minor" value={jackpot?.main || 15420.50} />
             <JackpotCounter label="Major" value={jackpot?.major || 85400.00} />
             <JackpotCounter label="Grand" value={jackpot?.grand || 1250000.00} />
           </div>
@@ -73,17 +75,17 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-4 py-6 border-y border-white/5">
             <div className="flex flex-col items-center text-center gap-1">
               <Users className="w-5 h-5 text-primary mb-1" />
-              <span className="text-xl font-bold font-mono">{stats?.onlineUsers || '12,450'}</span>
+              <span className="text-xl font-bold font-mono">{stats?.onlineUsers ? formatNumber(stats.onlineUsers) : '12,450'}</span>
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Online Now</span>
             </div>
             <div className="flex flex-col items-center text-center gap-1 border-x border-white/5">
               <TrendingUp className="w-5 h-5 text-primary mb-1" />
-              <span className="text-xl font-bold font-mono">{stats?.totalBetsToday || '845,210'}</span>
+              <span className="text-xl font-bold font-mono">{stats?.totalBetsToday ? formatNumber(stats.totalBetsToday) : '8,45,210'}</span>
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Bets Today</span>
             </div>
             <div className="flex flex-col items-center text-center gap-1">
               <Trophy className="w-5 h-5 text-primary mb-1" />
-              <span className="text-xl font-bold font-mono">${stats?.biggestWinToday || '254K'}</span>
+              <span className="text-xl font-bold font-mono">{stats?.biggestWinToday ? formatCurrency(Number(stats.biggestWinToday)) : '৳2,54,000'}</span>
               <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Top Win</span>
             </div>
           </div>
