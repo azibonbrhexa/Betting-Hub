@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { DailyBonusModal } from "@/components/daily-bonus-modal";
+import { Analytics } from "@vercel/analytics/react";
 
 // Pages
 import NotFound from "@/pages/not-found";
@@ -89,6 +90,7 @@ function App() {
         </AuthProvider>
         <Toaster />
       </TooltipProvider>
+      <Analytics />
     </QueryClientProvider>
   );
 }
