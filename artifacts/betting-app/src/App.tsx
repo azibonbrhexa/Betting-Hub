@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { DailyBonusModal } from "@/components/daily-bonus-modal";
 
 // Pages
 import NotFound from "@/pages/not-found";
@@ -16,6 +17,11 @@ import GameDetail from "@/pages/games/[id]";
 import Bonuses from "@/pages/bonuses";
 import Referrals from "@/pages/referrals";
 import AdminLayout from "@/pages/admin/layout";
+import Leaderboard from "@/pages/leaderboard";
+import Achievements from "@/pages/achievements";
+import VIP from "@/pages/vip";
+import Promotions from "@/pages/promotions";
+import Support from "@/pages/support";
 
 const queryClient = new QueryClient();
 
@@ -23,16 +29,15 @@ function ProtectedRoute({ component: Component, adminOnly = false }: { component
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
 
-  if (!user) {
-    return <Redirect to="/auth/login" />;
-  }
-
-  if (adminOnly && user.role !== 'admin') {
-    return <Redirect to="/" />;
-  }
+  if (!user) return <Redirect to="/auth/login" />;
+  if (adminOnly && user.role !== 'admin') return <Redirect to="/" />;
 
   return <Component />;
 }
@@ -45,26 +50,33 @@ function Router() {
       <Route path="/auth/register" component={Register} />
       <Route path="/games" component={GamesLobby} />
       <Route path="/games/:id" component={GameDetail} />
-      
-      <Route path="/bonuses">
-        {() => <ProtectedRoute component={Bonuses} />}
-      </Route>
-      <Route path="/referrals">
-        {() => <ProtectedRoute component={Referrals} />}
-      </Route>
-      <Route path="/wallet">
-        {() => <ProtectedRoute component={Wallet} />}
-      </Route>
-      <Route path="/profile">
-        {() => <ProtectedRoute component={Profile} />}
-      </Route>
+      <Route path="/leaderboard" component={Leaderboard} />
+      <Route path="/promotions" component={Promotions} />
+      <Route path="/support" component={Support} />
+      <Route path="/vip" component={VIP} />
 
-      <Route path="/admin*">
-        {() => <ProtectedRoute component={AdminLayout} adminOnly={true} />}
-      </Route>
+      <Route path="/bonuses">{() => <ProtectedRoute component={Bonuses} />}</Route>
+      <Route path="/referrals">{() => <ProtectedRoute component={Referrals} />}</Route>
+      <Route path="/wallet">{() => <ProtectedRoute component={Wallet} />}</Route>
+      <Route path="/profile">{() => <ProtectedRoute component={Profile} />}</Route>
+      <Route path="/achievements">{() => <ProtectedRoute component={Achievements} />}</Route>
+
+      <Route path="/admin*">{() => <ProtectedRoute component={AdminLayout} adminOnly={true} />}</Route>
 
       <Route component={NotFound} />
     </Switch>
+  );
+}
+
+function AppInner() {
+  const { user } = useAuth();
+  return (
+    <>
+      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <Router />
+      </WouterRouter>
+      {user && <DailyBonusModal />}
+    </>
   );
 }
 
@@ -73,9 +85,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
+          <AppInner />
         </AuthProvider>
         <Toaster />
       </TooltipProvider>

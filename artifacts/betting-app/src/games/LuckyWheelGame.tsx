@@ -91,45 +91,93 @@ export default function LuckyWheelGame({ gameId }: { gameId: number }) {
   });
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <div className="relative flex items-center justify-center">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10 text-3xl">▼</div>
-        <motion.svg
-          width={size} height={size}
-          animate={{ rotate: rotation }}
-          transition={{ duration: 4.5, ease: [0.17, 0.67, 0.12, 0.99] }}
-          style={{ filter: "drop-shadow(0 0 20px rgba(212,175,55,0.3))" }}>
-          {segPaths.map((seg, i) => (
-            <g key={i}>
-              <path d={seg.d} fill={seg.color} stroke="#000" strokeWidth="1.5" />
-              <text x={seg.tx} y={seg.ty} textAnchor="middle" dominantBaseline="middle"
-                fontSize={SEGMENTS[i].mult >= 10 ? "11" : "12"} fontWeight="bold" fill={SEGMENTS[i].mult > 0 ? "#fff" : "#666"}>
-                {seg.label}
-              </text>
-            </g>
-          ))}
-          <circle cx={cx} cy={cy} r="18" fill="#D4AF37" stroke="#000" strokeWidth="2" />
-          <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize="16" fill="#000" fontWeight="900">★</text>
-        </motion.svg>
+    <div className="flex flex-col items-center gap-5">
+      {/* 3D Wheel Container */}
+      <div className="relative flex flex-col items-center" style={{ perspective: "800px" }}>
+        {/* Outer glow ring */}
+        <motion.div
+          className="absolute rounded-full"
+          animate={spinning ? { opacity: [0.3, 0.8, 0.3], scale: [0.95, 1.05, 0.95] } : { opacity: 0.4 }}
+          transition={{ repeat: spinning ? Infinity : 0, duration: 0.8 }}
+          style={{ width: size + 20, height: size + 20, top: -10, left: -10,
+            background: "radial-gradient(circle, rgba(224,170,62,0.15) 0%, transparent 70%)",
+            filter: "blur(10px)" }}
+        />
+
+        {/* Pointer */}
+        <div className="absolute top-1 left-1/2 -translate-x-1/2 z-20" style={{ filter: "drop-shadow(0 2px 8px #E0AA3E)" }}>
+          <svg width="24" height="28" viewBox="0 0 24 28">
+            <polygon points="12,28 0,0 24,0" fill="#E0AA3E" />
+            <polygon points="12,24 2,2 22,2" fill="#ffd700" />
+          </svg>
+        </div>
+
+        <motion.div
+          style={{
+            transformStyle: "preserve-3d",
+            filter: `drop-shadow(0 0 ${spinning ? "30px" : "15px"} rgba(212,175,55,${spinning ? "0.5" : "0.3"}))`,
+          }}
+          animate={{ rotateX: spinning ? [0, -8, 0] : 0 }}
+          transition={{ duration: 0.6, repeat: spinning ? Infinity : 0 }}
+        >
+          <motion.svg
+            width={size} height={size}
+            animate={{ rotate: rotation }}
+            transition={{ duration: 4.5, ease: [0.17, 0.67, 0.12, 0.99] }}>
+            {/* Outer ring */}
+            <circle cx={cx} cy={cy} r={r + 6} fill="none" stroke="#E0AA3E" strokeWidth="4" opacity="0.6" />
+            <circle cx={cx} cy={cy} r={r + 8} fill="none" stroke="#ffd700" strokeWidth="1" opacity="0.3" />
+
+            {segPaths.map((seg, i) => (
+              <g key={i}>
+                <path d={seg.d} fill={seg.color} stroke="#000" strokeWidth="1.5" />
+                {/* Inner shine */}
+                <path d={seg.d} fill="rgba(255,255,255,0.03)" stroke="none" />
+                <text x={seg.tx} y={seg.ty} textAnchor="middle" dominantBaseline="middle"
+                  fontSize={SEGMENTS[i].mult >= 10 ? "11" : "12"} fontWeight="bold"
+                  fill={SEGMENTS[i].mult > 0 ? "#fff" : "#555"}
+                  style={{ textShadow: SEGMENTS[i].mult > 3 ? "0 0 8px rgba(255,255,255,0.8)" : "none" }}>
+                  {seg.label}
+                </text>
+              </g>
+            ))}
+            {/* Center hub */}
+            <circle cx={cx} cy={cy} r="22" fill="#0d0d0d" stroke="#E0AA3E" strokeWidth="2" />
+            <circle cx={cx} cy={cy} r="18" fill="#E0AA3E" />
+            <circle cx={cx} cy={cy} r="14" fill="#ffd700" />
+            <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize="16" fill="#000" fontWeight="900">★</text>
+          </motion.svg>
+        </motion.div>
       </div>
 
       {result && (
         <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
-          className={`px-8 py-4 rounded-2xl text-center font-bold text-xl ${result.won ? "bg-green-500/20 text-green-400 border border-green-500/30" : "bg-red-500/20 text-red-400 border border-red-500/30"}`}>
-          {result.won ? `🎡 ${result.seg.label} — Won ${formatCurrency(result.payout)}!` : `🎡 ${result.seg.label} — Better luck next time!`}
+          className={`px-8 py-4 rounded-2xl text-center font-bold text-xl w-full ${
+            result.won
+              ? "bg-green-500/20 text-green-400 border border-green-500/30"
+              : "bg-red-500/20 text-red-400 border border-red-500/30"
+          }`}>
+          {result.won
+            ? `🎡 ${result.seg.label} — +${formatCurrency(result.payout)} জিতেছেন!`
+            : `🎡 ${result.seg.label} — পরের বার ভাগ্য থাকবে!`}
         </motion.div>
       )}
 
       <div className="w-full">
-        <label className="text-xs text-muted-foreground mb-1 block uppercase tracking-wider">Bet Amount</label>
-        <Input value={betAmount} onChange={e => setBetAmount(e.target.value)} type="number" className="bg-black/60 border-white/10 font-mono text-lg" disabled={spinning} />
+        <label className="text-xs text-muted-foreground mb-1 block uppercase tracking-wider">বেট পরিমাণ</label>
+        <Input value={betAmount} onChange={e => setBetAmount(e.target.value)} type="number"
+          className="bg-black/60 border-white/10 font-mono text-lg" disabled={spinning} />
         <div className="flex gap-1 mt-1">
-          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={spinning} className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1 font-mono transition-colors disabled:opacity-40">৳{a}</button>)}
+          {QUICK_AMOUNTS.map(a => <button key={a} onClick={() => setBetAmount(a)} disabled={spinning}
+            className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-1 py-1.5 font-mono transition-colors disabled:opacity-40">৳{a}</button>)}
+          <button onClick={() => setBetAmount(b => String(parseFloat(b) * 2))} disabled={spinning}
+            className="flex-1 text-xs bg-white/5 hover:bg-white/10 rounded px-2 py-1.5 font-mono transition-colors disabled:opacity-40">2x</button>
         </div>
       </div>
 
-      <Button onClick={spin} disabled={spinning} className="w-full h-14 text-xl font-bold bg-primary text-black hover:scale-[1.02] transition-transform shadow-[0_0_20px_rgba(212,175,55,0.3)]">
-        {spinning ? "🎡 Spinning..." : "🎡 Spin Wheel"}
+      <Button onClick={spin} disabled={spinning}
+        className="w-full h-14 text-xl font-bold bg-primary text-black hover:scale-[1.02] transition-transform shadow-[0_0_20px_rgba(212,175,55,0.4)] rounded-xl">
+        {spinning ? "🎡 ঘুরছে..." : "🎡 Wheel স্পিন করুন"}
       </Button>
     </div>
   );

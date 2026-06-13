@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, usersTable, walletsTable, transactionsTable, betsTable, bonusesTable, gamesTable } from "@workspace/db";
+import { db, usersTable, walletsTable, transactionsTable, betsTable, bonusesTable, gamesTable, pendingDepositsTable, notificationsTable } from "@workspace/db";
 import { eq, desc, ilike, sql, gte, and } from "drizzle-orm";
 import { authenticate, requireAdmin } from "../middlewares/auth";
 import type { AuthPayload } from "../middlewares/auth";
@@ -247,6 +247,86 @@ router.get("/reports/daily", async (req, res) => {
     revenue: deposits * 0.05,
     netRevenue: deposits * 0.05 - withdrawals * 0.01,
   });
+});
+
+// GET /api/admin/pending-deposits
+router.get("/pending-deposits", async (req, res) => {
+  const status = String(req.query.status ?? "pending");
+  const deposits = await db.select({
+    id: pendingDepositsTable.id,
+    userId: pendingDepositsTable.userId,
+    amount: pendingDepositsTable.amount,
+    method: pendingDepositsTable.method,
+    txId: pendingDepositsTable.txId,
+    senderNumber: pendingDepositsTable.senderNumber,
+    status: pendingDepositsTable.status,
+    adminNote: pendingDepositsTable.adminNote,
+    createdAt: pendingDepositsTable.createdAt,
+    username: usersTable.username,
+    email: usersTable.email,
+  }).from(pendingDepositsTable)
+    .leftJoin(usersTable, eq(pendingDepositsTable.userId, usersTable.id))
+    .where(status === "all" ? undefined : eq(pendingDepositsTable.status, status))
+    .orderBy(desc(pendingDepositsTable.createdAt))
+    .limit(50);
+  res.json(deposits.map(d => ({ ...d, amount: parseFloat(d.amount as string) })));
+});
+
+// POST /api/admin/pending-deposits/:id/approve
+router.post("/pending-deposits/:id/approve", async (req, res) => {
+  const id = parseInt(String(req.params.id));
+  const { note } = req.body;
+  const [dep] = await db.select().from(pendingDepositsTable).where(eq(pendingDepositsTable.id, id)).limit(1);
+  if (!dep) { res.status(404).json({ error: "Not found" }); return; }
+  if (dep.status !== "pending") { res.status(400).json({ error: "Already processed" }); return; }
+
+  await db.update(pendingDepositsTable)
+    .set({ status: "approved", adminNote: note ?? null, reviewedAt: new Date(), updatedAt: new Date() })
+    .where(eq(pendingDepositsTable.id, id));
+
+  await db.update(walletsTable)
+    .set({ balance: sql`balance + ${dep.amount}` })
+    .where(eq(walletsTable.userId, dep.userId));
+
+  await db.insert(transactionsTable).values({
+    userId: dep.userId,
+    type: "deposit",
+    amount: dep.amount as string,
+    status: "completed",
+    method: dep.method,
+    reference: `BKASH-${dep.txId}`,
+  });
+
+  await db.insert(notificationsTable).values({
+    userId: dep.userId,
+    title: "✅ ডিপোজিট অনুমোদিত!",
+    message: `৳${dep.amount} ${dep.method.toUpperCase()} ডিপোজিট অনুমোদিত হয়েছে এবং আপনার একাউন্টে যোগ হয়েছে।`,
+    type: "deposit",
+  });
+
+  res.json({ ok: true });
+});
+
+// POST /api/admin/pending-deposits/:id/reject
+router.post("/pending-deposits/:id/reject", async (req, res) => {
+  const id = parseInt(String(req.params.id));
+  const { note } = req.body;
+  const [dep] = await db.select().from(pendingDepositsTable).where(eq(pendingDepositsTable.id, id)).limit(1);
+  if (!dep) { res.status(404).json({ error: "Not found" }); return; }
+  if (dep.status !== "pending") { res.status(400).json({ error: "Already processed" }); return; }
+
+  await db.update(pendingDepositsTable)
+    .set({ status: "rejected", adminNote: note ?? null, reviewedAt: new Date(), updatedAt: new Date() })
+    .where(eq(pendingDepositsTable.id, id));
+
+  await db.insert(notificationsTable).values({
+    userId: dep.userId,
+    title: "❌ ডিপোজিট বাতিল",
+    message: `৳${dep.amount} ${dep.method.toUpperCase()} ডিপোজিট বাতিল হয়েছে। কারণ: ${note ?? "অজানা"}`,
+    type: "info",
+  });
+
+  res.json({ ok: true });
 });
 
 export default router;

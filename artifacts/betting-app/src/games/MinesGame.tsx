@@ -113,25 +113,67 @@ export default function MinesGame({ gameId }: { gameId: number }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-5 gap-1.5">
-        {tiles.map((tile, i) => (
-          <motion.button key={i} whileTap={{ scale: 0.9 }}
-            onClick={() => revealTile(i)}
-            disabled={!gameActive || tile !== "hidden"}
-            className={`aspect-square rounded-xl flex items-center justify-center text-2xl transition-all duration-200
-              ${tile === "hidden" ? "bg-white/8 hover:bg-primary/20 hover:border-primary/40 border border-white/10 cursor-pointer active:scale-95" : ""}
-              ${tile === "safe" ? "bg-green-500/20 border border-green-500/40" : ""}
-              ${tile === "mine" ? "bg-red-500/30 border border-red-500/50 animate-pulse" : ""}
-              ${tile === "unrevealed_mine" ? "bg-red-500/15 border border-red-500/20" : ""}
-              ${!gameActive && tile === "hidden" ? "opacity-40" : ""}
-            `}>
-            <AnimatePresence>
-              {tile === "safe" && <motion.div key="safe" initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }}><Diamond className="w-5 h-5 text-green-400" /></motion.div>}
-              {tile === "mine" && <motion.div key="mine" initial={{ scale: 2 }} animate={{ scale: 1 }}><Bomb className="w-6 h-6 text-red-400" /></motion.div>}
-              {tile === "unrevealed_mine" && <Bomb className="w-4 h-4 text-red-400/50" />}
-            </AnimatePresence>
-          </motion.button>
-        ))}
+      {/* 3D perspective grid */}
+      <div className="relative rounded-2xl overflow-hidden p-3"
+        style={{
+          background: "linear-gradient(180deg, #0d0d0d 0%, #1a1a00 100%)",
+          border: "1px solid rgba(224,170,62,0.15)",
+          perspective: "600px",
+        }}>
+        {/* Grid shadow */}
+        <div className="absolute inset-0 opacity-20"
+          style={{ background: "radial-gradient(ellipse at 50% 100%, rgba(0,255,0,0.15) 0%, transparent 70%)" }} />
+
+        <motion.div
+          className="grid grid-cols-5 gap-1.5 relative z-10"
+          style={{ transformStyle: "preserve-3d" }}
+          animate={gameOver === "lose" ? { rotateX: [0, -5, 0] } : {}}
+          transition={{ duration: 0.3 }}>
+          {tiles.map((tile, i) => (
+            <motion.button key={i}
+              whileHover={gameActive && tile === "hidden" ? { scale: 1.05, y: -2 } : {}}
+              whileTap={gameActive && tile === "hidden" ? { scale: 0.92 } : {}}
+              onClick={() => revealTile(i)}
+              disabled={!gameActive || tile !== "hidden"}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.01 }}
+              className={`aspect-square rounded-xl flex items-center justify-center transition-all duration-200 relative overflow-hidden
+                ${tile === "hidden" && gameActive ? "cursor-pointer" : ""}
+                ${tile === "hidden" ? "bg-gradient-to-b from-white/10 to-white/5 border border-white/10 hover:border-primary/40 hover:from-primary/20 hover:to-primary/10" : ""}
+                ${tile === "safe" ? "bg-gradient-to-b from-green-500/30 to-green-600/20 border border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.3)]" : ""}
+                ${tile === "mine" ? "bg-gradient-to-b from-red-600/40 to-red-800/30 border border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.5)]" : ""}
+                ${tile === "unrevealed_mine" ? "bg-red-500/10 border border-red-500/20 opacity-60" : ""}
+                ${!gameActive && tile === "hidden" ? "opacity-30" : ""}
+              `}
+              style={{
+                boxShadow: tile === "hidden" && gameActive ? "0 4px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)" : undefined,
+              }}>
+
+              {/* Hidden tile sheen */}
+              {tile === "hidden" && (
+                <div className="absolute inset-0 rounded-xl opacity-30"
+                  style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)" }} />
+              )}
+
+              <AnimatePresence>
+                {tile === "safe" && (
+                  <motion.div key="safe" initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}>
+                    <Diamond className="w-5 h-5 text-green-400 drop-shadow-[0_0_6px_rgba(74,222,128,0.8)]" />
+                  </motion.div>
+                )}
+                {tile === "mine" && (
+                  <motion.div key="mine" initial={{ scale: 3, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}>
+                    <Bomb className="w-5 h-5 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+                  </motion.div>
+                )}
+                {tile === "unrevealed_mine" && <Bomb className="w-4 h-4 text-red-400/40" />}
+              </AnimatePresence>
+            </motion.button>
+          ))}
+        </motion.div>
       </div>
 
       {gameOver && (

@@ -1,0 +1,3 @@
+- [BetRoyal bKash deposit flow](bkash-deposit.md) — manual TxID flow: user sends to merchant +8801944265045, submits TxID → pending_deposits table → admin approves/rejects.
+- [New API routes not in OpenAPI spec](direct-fetch-pattern.md) — notifications, leaderboard, achievements, daily-bonus, pending-deposits use direct fetch with BASE = import.meta.env.BASE_URL.replace(/\/$/, "").
+- [Generated hook quirks](generated-hook-quirks.md) — hooks like useGetMe, useGetWallet, useGetNotifications need `// @ts-ignore` before the `query:` property line; useGetTransactions takes `{limit: 30}` as first arg.

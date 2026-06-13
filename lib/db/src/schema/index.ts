@@ -6,3 +6,6 @@ export * from "./bets";
 export * from "./bonuses";
 export * from "./notifications";
 export * from "./favorites";
+export * from "./achievements";
+export * from "./daily_logins";
+export * from "./pending_deposits";

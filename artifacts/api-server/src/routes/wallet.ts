@@ -1,10 +1,14 @@
 import { Router } from "express";
-import { db, walletsTable, transactionsTable } from "@workspace/db";
+import { db, walletsTable, transactionsTable, pendingDepositsTable, notificationsTable, usersTable } from "@workspace/db";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { authenticate } from "../middlewares/auth";
 import type { AuthPayload } from "../middlewares/auth";
 
 const router = Router();
+
+const BKASH_MERCHANT = "+8801944265045";
+const NAGAD_MERCHANT = "+8801944265045";
+const ROCKET_MERCHANT = "+8801944265045";
 
 function formatWallet(w: typeof walletsTable.$inferSelect) {
   return {
@@ -40,12 +44,55 @@ router.get("/", authenticate, async (req, res) => {
   res.json(formatWallet(wallet));
 });
 
-// POST /api/wallet/deposit
+// GET /api/wallet/merchant-numbers
+router.get("/merchant-numbers", authenticate, async (_req, res) => {
+  res.json({
+    bkash: BKASH_MERCHANT,
+    nagad: NAGAD_MERCHANT,
+    rocket: ROCKET_MERCHANT,
+  });
+});
+
+// POST /api/wallet/deposit  (instant for card/crypto, pending for mobile banking)
 router.post("/deposit", authenticate, async (req, res) => {
   const { userId } = (req as any).user as AuthPayload;
-  const { amount, method, currency } = req.body;
+  const { amount, method, currency, txId, senderNumber } = req.body;
   if (!amount || amount <= 0) {
     res.status(400).json({ error: "Invalid amount" });
+    return;
+  }
+
+  const mobileMethod = ["bkash", "nagad", "rocket"].includes(method);
+
+  if (mobileMethod) {
+    if (!txId || txId.trim().length < 4) {
+      res.status(400).json({ error: "Transaction ID প্রয়োজন" });
+      return;
+    }
+    const existing = await db.select().from(pendingDepositsTable)
+      .where(and(eq(pendingDepositsTable.txId, txId.trim()), eq(pendingDepositsTable.method, method)));
+    if (existing.length > 0) {
+      res.status(400).json({ error: "এই Transaction ID আগেই ব্যবহার হয়েছে" });
+      return;
+    }
+
+    const [pending] = await db.insert(pendingDepositsTable).values({
+      userId,
+      amount: String(amount),
+      method,
+      txId: txId.trim(),
+      senderNumber: senderNumber ?? null,
+      status: "pending",
+    }).returning();
+
+    await db.insert(notificationsTable).values({
+      userId,
+      title: "⏳ ডিপোজিট রিভিউতে আছে",
+      message: `৳${amount} ${method.toUpperCase()} ডিপোজিট রিভিউ করা হচ্ছে। TxID: ${txId}`,
+      type: "deposit",
+    });
+
+    res.status(201).json({ pending: true, id: pending.id, status: "pending", amount, method });
     return;
   }
 
@@ -63,6 +110,16 @@ router.post("/deposit", authenticate, async (req, res) => {
     .where(eq(walletsTable.userId, userId));
 
   res.status(201).json(formatTx(tx));
+});
+
+// GET /api/wallet/pending-deposits
+router.get("/pending-deposits", authenticate, async (req, res) => {
+  const { userId } = (req as any).user as AuthPayload;
+  const deposits = await db.select().from(pendingDepositsTable)
+    .where(eq(pendingDepositsTable.userId, userId))
+    .orderBy(desc(pendingDepositsTable.createdAt))
+    .limit(20);
+  res.json(deposits.map(d => ({ ...d, amount: parseFloat(d.amount) })));
 });
 
 // POST /api/wallet/withdraw
@@ -89,9 +146,16 @@ router.post("/withdraw", authenticate, async (req, res) => {
     type: "withdrawal",
     amount: String(amount),
     status: "pending",
-    method: method ?? "bank",
+    method: method ?? "bkash",
     reference: `WTH-${Date.now()}`,
   }).returning();
+
+  await db.insert(notificationsTable).values({
+    userId,
+    title: "💸 উইথড্র অনুরোধ পাওয়া গেছে",
+    message: `৳${amount} ${(method ?? "bkash").toUpperCase()}-এ উইথড্র প্রসেস হচ্ছে।`,
+    type: "withdrawal",
+  });
 
   res.status(201).json(formatTx(tx));
 });
