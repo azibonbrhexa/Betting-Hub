@@ -1,22 +1,39 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: BetRoyal Betting & Casino Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: users
+    description: User profiles
+  - name: wallet
+    description: Wallet operations
+  - name: games
+    description: Game catalog
+  - name: bets
+    description: Betting operations
+  - name: bonuses
+    description: Bonus system
+  - name: referrals
+    description: Referral system
+  - name: admin
+    description: Admin operations
+  - name: stats
+    description: Statistics & analytics
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +41,812 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # AUTH
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      tags: [auth]
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # USERS
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      operationId: updateMe
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/me/kyc:
+    post:
+      operationId: submitKyc
+      tags: [users]
+      summary: Submit KYC documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KycInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KycStatus"
+
+  /users/me/change-password:
+    post:
+      operationId: changePassword
+      tags: [users]
+      summary: Change password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /users/me/notifications:
+    get:
+      operationId: getNotifications
+      tags: [users]
+      summary: Get user notifications
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  # WALLET
+  /wallet:
+    get:
+      operationId: getWallet
+      tags: [wallet]
+      summary: Get wallet balances
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Wallet"
+
+  /wallet/deposit:
+    post:
+      operationId: createDeposit
+      tags: [wallet]
+      summary: Create a deposit request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DepositInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+
+  /wallet/withdraw:
+    post:
+      operationId: createWithdrawal
+      tags: [wallet]
+      summary: Create a withdrawal request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WithdrawalInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+
+  /wallet/transactions:
+    get:
+      operationId: getTransactions
+      tags: [wallet]
+      summary: Get transaction history
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionList"
+
+  /wallet/summary:
+    get:
+      operationId: getWalletSummary
+      tags: [wallet]
+      summary: Get wallet statistics summary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletSummary"
+
+  # GAMES
+  /games:
+    get:
+      operationId: getGames
+      tags: [games]
+      summary: Get all games
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: provider
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameList"
+
+  /games/trending:
+    get:
+      operationId: getTrendingGames
+      tags: [games]
+      summary: Get trending/popular games
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+
+  /games/featured:
+    get:
+      operationId: getFeaturedGames
+      tags: [games]
+      summary: Get featured games
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+
+  /games/categories:
+    get:
+      operationId: getGameCategories
+      tags: [games]
+      summary: Get game categories with counts
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameCategory"
+
+  /games/{id}:
+    get:
+      operationId: getGame
+      tags: [games]
+      summary: Get game details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+
+  /games/{id}/launch:
+    post:
+      operationId: launchGame
+      tags: [games]
+      summary: Launch a game session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameLaunchResponse"
+
+  /games/favorites:
+    get:
+      operationId: getFavoriteGames
+      tags: [games]
+      summary: Get user's favorite games
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+
+  /games/{id}/favorite:
+    post:
+      operationId: toggleFavoriteGame
+      tags: [games]
+      summary: Toggle game favorite
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  # BETS
+  /bets:
+    post:
+      operationId: placeBet
+      tags: [bets]
+      summary: Place a bet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BetInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bet"
+    get:
+      operationId: getBets
+      tags: [bets]
+      summary: Get bet history
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BetList"
+
+  /bets/recent:
+    get:
+      operationId: getRecentBets
+      tags: [bets]
+      summary: Get recent bets feed (all users, public)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PublicBet"
+
+  /bets/stats:
+    get:
+      operationId: getBetStats
+      tags: [bets]
+      summary: Get user betting statistics
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BetStats"
+
+  # BONUSES
+  /bonuses:
+    get:
+      operationId: getBonuses
+      tags: [bonuses]
+      summary: Get available bonuses
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bonus"
+
+  /bonuses/active:
+    get:
+      operationId: getActiveBonuses
+      tags: [bonuses]
+      summary: Get user's active bonuses
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserBonus"
+
+  /bonuses/{id}/claim:
+    post:
+      operationId: claimBonus
+      tags: [bonuses]
+      summary: Claim a bonus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserBonus"
+
+  # REFERRALS
+  /referrals:
+    get:
+      operationId: getReferrals
+      tags: [referrals]
+      summary: Get referral info and list
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralInfo"
+
+  /referrals/summary:
+    get:
+      operationId: getReferralSummary
+      tags: [referrals]
+      summary: Get referral earnings summary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralSummary"
+
+  # STATS / HOME
+  /stats/platform:
+    get:
+      operationId: getPlatformStats
+      tags: [stats]
+      summary: Get public platform stats (jackpot, online users, etc.)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
+  /stats/jackpot:
+    get:
+      operationId: getJackpot
+      tags: [stats]
+      summary: Get current jackpot amounts
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JackpotInfo"
+
+  # ADMIN
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Get admin dashboard statistics
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
+  /admin/users:
+    get:
+      operationId: getAdminUsers
+      tags: [admin]
+      summary: Get all users (admin)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserList"
+
+  /admin/users/{id}:
+    get:
+      operationId: getAdminUser
+      tags: [admin]
+      summary: Get user details (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+    patch:
+      operationId: updateAdminUser
+      tags: [admin]
+      summary: Update user status/details (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUserUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+
+  /admin/users/{id}/wallet:
+    post:
+      operationId: adminAdjustWallet
+      tags: [admin]
+      summary: Manually adjust user wallet (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalletAdjustInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Wallet"
+
+  /admin/games:
+    get:
+      operationId: getAdminGames
+      tags: [admin]
+      summary: Get all games (admin)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+
+  /admin/games/{id}:
+    patch:
+      operationId: updateAdminGame
+      tags: [admin]
+      summary: Update game settings (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminGameUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+
+  /admin/bonuses:
+    get:
+      operationId: getAdminBonuses
+      tags: [admin]
+      summary: Get all bonuses (admin)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bonus"
+    post:
+      operationId: createAdminBonus
+      tags: [admin]
+      summary: Create a bonus (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BonusInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bonus"
+
+  /admin/transactions:
+    get:
+      operationId: getAdminTransactions
+      tags: [admin]
+      summary: Get all transactions (admin)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionList"
+
+  /admin/reports/daily:
+    get:
+      operationId: getDailyReport
+      tags: [admin]
+      summary: Get daily report
+      parameters:
+        - name: date
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DailyReport"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +854,687 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+
+    # AUTH
+    RegisterInput:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+          minLength: 3
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        referralCode:
+          type: ["string", "null"]
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    RefreshTokenInput:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [accessToken, refreshToken, user]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    # USER
+    User:
+      type: object
+      required: [id, username, email, role, status, createdAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [user, admin, agent]
+        status:
+          type: string
+          enum: [active, suspended, banned]
+        avatar:
+          type: ["string", "null"]
+        kycStatus:
+          type: string
+          enum: [none, pending, approved, rejected]
+        vipLevel:
+          type: integer
+        referralCode:
+          type: string
+        createdAt:
+          type: string
+
+    UserUpdate:
+      type: object
+      properties:
+        username:
+          type: string
+        avatar:
+          type: string
+
+    KycInput:
+      type: object
+      required: [fullName, documentType, documentNumber]
+      properties:
+        fullName:
+          type: string
+        documentType:
+          type: string
+        documentNumber:
+          type: string
+        documentFront:
+          type: string
+        documentBack:
+          type: string
+
+    KycStatus:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+
+    ChangePasswordInput:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 6
+
+    Notification:
+      type: object
+      required: [id, title, message, read, createdAt]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+        read:
+          type: boolean
+        createdAt:
+          type: string
+
+    # WALLET
+    Wallet:
+      type: object
+      required: [id, userId, balance, bonusBalance, currency]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        balance:
+          type: number
+        bonusBalance:
+          type: number
+        currency:
+          type: string
+
+    WalletSummary:
+      type: object
+      required: [totalDeposited, totalWithdrawn, totalWagered, totalWon, netProfitLoss]
+      properties:
+        totalDeposited:
+          type: number
+        totalWithdrawn:
+          type: number
+        totalWagered:
+          type: number
+        totalWon:
+          type: number
+        netProfitLoss:
+          type: number
+
+    DepositInput:
+      type: object
+      required: [amount, method]
+      properties:
+        amount:
+          type: number
+          minimum: 1
+        method:
+          type: string
+        currency:
+          type: string
+
+    WithdrawalInput:
+      type: object
+      required: [amount, method, address]
+      properties:
+        amount:
+          type: number
+          minimum: 10
+        method:
+          type: string
+        address:
+          type: string
+
+    Transaction:
+      type: object
+      required: [id, userId, type, amount, status, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        type:
+          type: string
+          enum: [deposit, withdrawal, bet, win, bonus, referral]
+        amount:
+          type: number
+        status:
+          type: string
+          enum: [pending, completed, failed, cancelled]
+        method:
+          type: ["string", "null"]
+        reference:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    TransactionList:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    # GAMES
+    Game:
+      type: object
+      required: [id, name, slug, category, provider, rtp, isActive, isFeatured]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        category:
+          type: string
+          enum: [slots, live_casino, sports, crash, mines, dice, plinko, limbo, keno, coin_flip, lucky_wheel, fishing, cards, blockchain]
+        provider:
+          type: string
+        thumbnail:
+          type: ["string", "null"]
+        rtp:
+          type: number
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        isPopular:
+          type: boolean
+        maxWin:
+          type: ["number", "null"]
+        minBet:
+          type: number
+        maxBet:
+          type: number
+        isFavorited:
+          type: boolean
+        playCount:
+          type: integer
+
+    GameList:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Game"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    GameCategory:
+      type: object
+      required: [name, slug, count, icon]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        count:
+          type: integer
+        icon:
+          type: string
+
+    GameLaunchResponse:
+      type: object
+      required: [sessionId, gameUrl]
+      properties:
+        sessionId:
+          type: string
+        gameUrl:
+          type: string
+
+    # BETS
+    BetInput:
+      type: object
+      required: [gameId, amount, gameData]
+      properties:
+        gameId:
+          type: integer
+        amount:
+          type: number
+          minimum: 0.1
+        gameData:
+          type: object
+
+    Bet:
+      type: object
+      required: [id, userId, gameId, amount, payout, status, createdAt]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        gameId:
+          type: integer
+        gameName:
+          type: string
+        amount:
+          type: number
+        payout:
+          type: number
+        multiplier:
+          type: ["number", "null"]
+        status:
+          type: string
+          enum: [pending, won, lost, cancelled]
+        gameData:
+          type: object
+        createdAt:
+          type: string
+
+    BetList:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Bet"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    PublicBet:
+      type: object
+      required: [id, username, gameName, amount, payout, multiplier, createdAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        avatar:
+          type: ["string", "null"]
+        gameName:
+          type: string
+        amount:
+          type: number
+        payout:
+          type: number
+        multiplier:
+          type: number
+        status:
+          type: string
+        createdAt:
+          type: string
+
+    BetStats:
+      type: object
+      required: [totalBets, totalWagered, totalWon, biggestWin, winRate]
+      properties:
+        totalBets:
+          type: integer
+        totalWagered:
+          type: number
+        totalWon:
+          type: number
+        biggestWin:
+          type: number
+        winRate:
+          type: number
+
+    # BONUSES
+    Bonus:
+      type: object
+      required: [id, name, type, value, isActive]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [welcome, first_deposit, cashback, daily, vip, referral]
+        value:
+          type: number
+        valueType:
+          type: string
+          enum: [percentage, fixed]
+        minDeposit:
+          type: ["number", "null"]
+        maxBonus:
+          type: ["number", "null"]
+        wagerRequirement:
+          type: number
+        expiresIn:
+          type: ["integer", "null"]
+        isActive:
+          type: boolean
+
+    UserBonus:
+      type: object
+      required: [id, bonusId, userId, amount, wagerRequired, wagerCompleted, status, createdAt]
+      properties:
+        id:
+          type: integer
+        bonusId:
+          type: integer
+        userId:
+          type: integer
+        bonus:
+          $ref: "#/components/schemas/Bonus"
+        amount:
+          type: number
+        wagerRequired:
+          type: number
+        wagerCompleted:
+          type: number
+        status:
+          type: string
+          enum: [active, completed, expired, cancelled]
+        expiresAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    BonusInput:
+      type: object
+      required: [name, type, value, valueType, wagerRequirement]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        value:
+          type: number
+        valueType:
+          type: string
+        minDeposit:
+          type: number
+        maxBonus:
+          type: number
+        wagerRequirement:
+          type: number
+        expiresIn:
+          type: integer
+        isActive:
+          type: boolean
+
+    # REFERRALS
+    ReferralInfo:
+      type: object
+      required: [referralCode, referralLink, totalReferrals, referrals]
+      properties:
+        referralCode:
+          type: string
+        referralLink:
+          type: string
+        totalReferrals:
+          type: integer
+        referrals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Referral"
+
+    Referral:
+      type: object
+      required: [id, username, status, commission, createdAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        status:
+          type: string
+        commission:
+          type: number
+        totalWagered:
+          type: number
+        createdAt:
+          type: string
+
+    ReferralSummary:
+      type: object
+      required: [totalReferrals, totalEarned, pendingEarnings, thisMonthEarnings, commissionRate]
+      properties:
+        totalReferrals:
+          type: integer
+        totalEarned:
+          type: number
+        pendingEarnings:
+          type: number
+        thisMonthEarnings:
+          type: number
+        commissionRate:
+          type: number
+
+    # STATS
+    PlatformStats:
+      type: object
+      required: [onlineUsers, totalBetsToday, biggestWinToday, jackpotAmount]
+      properties:
+        onlineUsers:
+          type: integer
+        totalBetsToday:
+          type: integer
+        biggestWinToday:
+          type: number
+        jackpotAmount:
+          type: number
+
+    JackpotInfo:
+      type: object
+      required: [main, mini, major, grand]
+      properties:
+        main:
+          type: number
+        mini:
+          type: number
+        major:
+          type: number
+        grand:
+          type: number
+
+    # ADMIN
+    AdminStats:
+      type: object
+      required: [totalUsers, activeUsers, totalDeposits, totalWithdrawals, totalBets, revenue, todayRevenue, todayBets, todayNewUsers]
+      properties:
+        totalUsers:
+          type: integer
+        activeUsers:
+          type: integer
+        totalDeposits:
+          type: number
+        totalWithdrawals:
+          type: number
+        totalBets:
+          type: integer
+        revenue:
+          type: number
+        todayRevenue:
+          type: number
+        todayBets:
+          type: integer
+        todayNewUsers:
+          type: integer
+
+    AdminUser:
+      type: object
+      required: [id, username, email, role, status, balance, totalDeposited, totalBets, createdAt]
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        status:
+          type: string
+        balance:
+          type: number
+        bonusBalance:
+          type: number
+        totalDeposited:
+          type: number
+        totalWithdrawn:
+          type: number
+        totalBets:
+          type: integer
+        kycStatus:
+          type: string
+        vipLevel:
+          type: integer
+        createdAt:
+          type: string
+
+    AdminUserList:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminUser"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    AdminUserUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+        role:
+          type: string
+        vipLevel:
+          type: integer
+
+    WalletAdjustInput:
+      type: object
+      required: [amount, type, reason]
+      properties:
+        amount:
+          type: number
+        type:
+          type: string
+          enum: [credit, debit]
+        reason:
+          type: string
+
+    AdminGameUpdate:
+      type: object
+      properties:
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        isPopular:
+          type: boolean
+        rtp:
+          type: number
+        minBet:
+          type: number
+        maxBet:
+          type: number
+
+    DailyReport:
+      type: object
+      required: [date, newUsers, deposits, withdrawals, bets, revenue, netRevenue]
+      properties:
+        date:
+          type: string
+        newUsers:
+          type: integer
+        deposits:
+          type: number
+        withdrawals:
+          type: number
+        bets:
+          type: integer
+        totalWagered:
+          type: number
+        revenue:
+          type: number
+        netRevenue:
+          type: number

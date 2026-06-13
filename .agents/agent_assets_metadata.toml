@@ -1,0 +1,62 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "lh6eMIrly4KYGjdm3Musi"
+uri = "file://artifacts/betting-app/public/images/hero.png"
+type = "image"
+title = "Monaco VIP casino lounge"
+
+[[generated]]
+id = "0uNwAadzOq9hTG3m1lnFT"
+uri = "file://artifacts/betting-app/public/images/slots.png"
+type = "image"
+title = "Luxury slot machine interface"
+
+[[generated]]
+id = "pBiHDLWyJLRwM6_G8Y13C"
+uri = "file://artifacts/betting-app/public/images/crash.png"
+type = "image"
+title = "Crash game multiplier graph"
+
+[[generated]]
+id = "y97WuDm1n4VCn0P4F9sMf"
+uri = "file://artifacts/betting-app/public/images/roulette.png"
+type = "image"
+title = "Luxury roulette wheel"
+
+[[generated]]
+id = "XZpQuwo4I5wVPSwDVA3Jv"
+uri = "file://artifacts/betting-app/public/images/blackjack.png"
+type = "image"
+title = "Premium blackjack table"
+
+[[generated]]
+id = "dwgu5YuSl5JaFFO9pwm3K"
+uri = "file://artifacts/betting-app/public/images/baccarat.png"
+type = "image"
+title = "Baccarat cards on table"
+
+[[generated]]
+id = "brDZCkfNTzvMmDounNgmh"
+uri = "file://artifacts/betting-app/public/images/plinko.png"
+type = "image"
+title = "Plinko pegboard game"
+
+[[generated]]
+id = "11_3U3q4qgJY_n4eztaSL"
+uri = "file://artifacts/betting-app/public/images/mines.png"
+type = "image"
+title = "Minesweeper casino game"
+
+[[generated]]
+id = "5KihDcnT5hLOHVM4kSDQK"
+uri = "file://artifacts/betting-app/public/images/dice.png"
+type = "image"
+title = "Golden casino dice"
+
+[[generated]]
+id = "VRbxdy_MMcmwyLeekbail"
+uri = "file://artifacts/betting-app/public/images/lucky-wheel.png"
+type = "image"
+title = "Glowing fortune wheel"

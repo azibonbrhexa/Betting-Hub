@@ -1,0 +1,284 @@
+Build a complete production-ready mobile-first Betting & Casino Platform inspired by modern platforms like GoldsBet, 1Win, Mostbet and BC.Game.
+
+TECH STACK
+
+Frontend:
+- Next.js 15
+- React 19
+- TailwindCSS
+- Framer Motion
+- Redux Toolkit
+- Axios
+- PWA Support
+
+Backend:
+- Node.js
+- Express.js
+- JWT Authentication
+- REST API Architecture
+- Socket.IO
+- Rate Limiting
+- RBAC Authorization
+
+Database:
+- MongoDB
+- Mongoose ODM
+- Redis Cache
+
+Project Architecture:
+
+src/
+│
+├── client/
+│   ├── pages/
+│   ├── components/
+│   ├── hooks/
+│   ├── services/
+│   ├── redux/
+│   ├── layouts/
+│   ├── utils/
+│   └── assets/
+│
+├── server/
+│   ├── controllers/
+│   ├── services/
+│   ├── middleware/
+│   ├── routes/
+│   ├── sockets/
+│   ├── providers/
+│   ├── validators/
+│   └── config/
+│
+└── database/
+    ├── models/
+    ├── migrations/
+    └── seeders/
+
+USER FEATURES
+
+Authentication
+- Register
+- Login
+- Forgot Password
+- OTP Verification
+- JWT Login
+- Device Tracking
+- Security Logs
+
+Home Page
+- Hero Banner Slider
+- Promotions
+- Popular Games
+- Featured Games
+- Jackpot Counter
+- Trending Games
+- Category Navigation
+
+Wallet System
+- Main Balance
+- Bonus Balance
+- Deposit
+- Withdraw
+- Transaction History
+- Ledger System
+- Balance Transfer
+
+Game Lobby
+- Slot Games
+- Live Casino
+- Cricket
+- Football
+- Basketball
+- Volleyball
+- Fishing
+- Cards
+- Blockchain Games
+
+Internal Games
+- Coin Flip
+- Dice Roll
+- Mines
+- Keno
+- Plinko
+- Limbo
+- Crash
+- Lucky Wheel
+
+Referral System
+- Referral Code
+- Invite Friends
+- Commission Tracking
+- Multi-Level Referral
+
+Bonus System
+- Welcome Bonus
+- First Deposit Bonus
+- Cashback Bonus
+- Daily Bonus
+- VIP Bonus
+
+User Profile
+- Personal Info
+- KYC Verification
+- Change Password
+- Security Settings
+- Betting History
+- Wallet History
+
+ADMIN PANEL
+
+Dashboard
+- Total Users
+- Active Users
+- Revenue
+- Deposits
+- Withdrawals
+- Bets
+- Profit Analytics
+
+User Management
+- Ban User
+- Suspend User
+- Edit User
+- KYC Review
+- Wallet Adjustment
+
+Wallet Management
+- Manual Deposit
+- Manual Withdraw
+- Balance Adjustment
+- Transaction Review
+
+Game Management
+- Enable Game
+- Disable Game
+- RTP Settings
+- Provider Management
+
+Bonus Management
+- Create Bonus
+- Edit Bonus
+- Disable Bonus
+
+Referral Management
+- Commission Control
+- Referral Reports
+
+Agent System
+- Create Agent
+- Agent Commission
+- Agent Dashboard
+
+REPORTS
+
+- Daily Reports
+- Weekly Reports
+- Monthly Reports
+- Revenue Reports
+- User Reports
+- Bet Reports
+- Transaction Reports
+
+DATABASE TABLES
+
+Users
+Wallets
+Transactions
+Deposits
+Withdrawals
+Bets
+BetHistory
+GameHistory
+BonusHistory
+ReferralHistory
+Agents
+Commissions
+Notifications
+Settings
+KYC
+AuditLogs
+Providers
+
+UI DESIGN
+
+Theme:
+- Dark Luxury Theme
+- Black Background
+- Gold Accent Color
+- Glassmorphism Effects
+- Smooth Animations
+- Mobile First
+
+Header:
+- Logo
+- Balance Widget
+- Notification Icon
+- Deposit Button
+
+Home:
+- Banner Slider
+- Category Icons
+- Jackpot Section
+- Game Grid
+
+Bottom Navigation:
+- Home
+- Promo
+- Deposit
+- Invite
+- Profile
+
+GAME CARD DESIGN
+
+Each game card should contain:
+- Thumbnail
+- Provider Name
+- Favorite Button
+- Popular Tag
+- RTP Display
+- Launch Button
+
+SECURITY
+
+- JWT Authentication
+- Refresh Tokens
+- CSRF Protection
+- XSS Protection
+- Rate Limiting
+- IP Tracking
+- Audit Logs
+- Device Fingerprinting
+
+API MODULES
+
+/auth
+/user
+/wallet
+/deposit
+/withdraw
+/game
+/provider
+/bonus
+/referral
+/agent
+/admin
+/report
+
+Generate:
+1. Full frontend
+2. Full backend
+3. Database schemas
+4. API routes
+5. Controllers
+6. Services
+7. Middleware
+8. Admin Panel
+9. User Panel
+10. Responsive UI
+11. Complete folder structure
+12. Production deployment configuration
+13. Docker support
+14. Nginx configuration
+15. CI/CD configuration
+
+Code must be scalable, modular, enterprise-grade, production-ready, and fully responsive.
